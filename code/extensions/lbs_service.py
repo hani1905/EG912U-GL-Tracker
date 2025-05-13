@@ -20,6 +20,7 @@ class LbsService(object):
     
 
     def init_app(self, app):
+        self.event = app.event
         app.register('lbs_service', self)
 
     def load(self):
@@ -30,11 +31,11 @@ class LbsService(object):
         cell_info = net.getCellInfo()
         if cell_info != -1 and cell_info[2]:
             first_tuple = cell_info[2]
-            mcc_decimal = first_tuple[0][2]  # 获取十进制MCC (如1120)
-            mcc_hex = "{:x}".format(mcc_decimal).upper()  # 转换为十六进制 (如'460')
+            mcc_decimal = first_tuple[0][2]  # Retrieve the decimal MCC (e.g., 1120)
+            #mcc_hex = "{:x}".format(mcc_decimal).upper()  # Convert to hexadecimal (e.g., '460')
 
             lbs_data = "$LBS,{},{},{},{},{},0*69;".format(
-                mcc_hex,
+                mcc_decimal,
                 first_tuple[0][3],
                 first_tuple[0][5],
                 first_tuple[0][1],
@@ -44,22 +45,26 @@ class LbsService(object):
 
     def start_update(self):
         while True:
-            lbs_data = self.read()
-            if lbs_data is None:
-                utime.sleep(2)
-                continue
+            if self.event.is_set():
+                print('\nLBS: USO')
+                lbs_data = self.read()
+                if lbs_data is None:
+                    utime.sleep(2)
+                    continue
 
-            for _ in range(3):
-                with CurrentApp().qth_client:
-                    if CurrentApp().qth_client.sendLbs(lbs_data):
-                        break
+                for _ in range(3):
+                    with CurrentApp().qth_client:
+                        if CurrentApp().qth_client.sendLbs(lbs_data):
+                            break
+                else:
+                    logger.debug("send lbs data to qth server fail, next report will be after 2 seconds")
+                    utime.sleep(2)
+                    continue
+                
+                logger.debug("send lbs data to qth server success, next report will be after 1800 seconds")
+                utime.sleep(15)
             else:
-                logger.debug("send lbs data to qth server fail, next report will be after 2 seconds")
-                utime.sleep(2)
-                continue
-            
-            logger.debug("send lbs data to qth server success, next report will be after 1800 seconds")
-            utime.sleep(1800)
+                utime.sleep(0.1)
             
     def put_lbs(self):
             while True:

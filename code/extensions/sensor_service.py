@@ -64,7 +64,6 @@ class SensorService(object):
 
         while True:
             data = {}
-
             try:
                 temp1, humi = self.shtc3.getTempAndHumi()
                 logger.debug("temp1: {:0.2f}, humi: {:0.2f}".format(temp1, humi))
@@ -120,7 +119,7 @@ class SensorService(object):
                     prev_b = prev_rgb888 & 0xFF
                     db = abs(b - prev_b)
 
-                    # 色差超过 150 即认为颜色有变化
+                    # If the color difference exceeds 150, it is considered that the color has changed
                     if pow(sum((dr*dr, dg*dg, db*db)), 0.5) >= 150:
                         data.update({7: {1: r, 2: g, 3: b}})
                         prev_rgb888 = rgb888

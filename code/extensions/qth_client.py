@@ -47,6 +47,7 @@ class QthClient(object):
     
     def stop(self):
         Qth.stop()
+        
     def sendTsl(self, mode, value):
         return Qth.sendTsl(mode, value)
 
@@ -72,11 +73,12 @@ class QthClient(object):
         logger.info("recvTsl:{}".format(value))
         for cmdId, val in value.items():
             logger.info("recvTsl {}:{}".format(cmdId, val))
+
     def readTslCallback(self, ids, pkgId):
         logger.info("readTsl ids:{} pkgId:{}".format(ids, pkgId))
         value=dict()
         
-        temp1, humi =CurrentApp().sensor_service.get_temp1_and_humi()
+        temp1, humi = CurrentApp().sensor_service.get_temp1_and_humi()
         press, temp2 = CurrentApp().sensor_service.get_press_and_temp2()
         r,g,b = CurrentApp().sensor_service.get_rgb888()
 
@@ -108,7 +110,7 @@ class QthClient(object):
         
     def sotaInfoCallback(self, comp_no, version, url, md5, crc):
         logger.info("sotaInfo comp_no:{} version:{} url:{} md5:{} crc:{}".format(comp_no, version, url, md5, crc))
-        # 当使用url下载固件完成，且MCU更新完毕后，需要获取MCU最新的版本信息，并通过setMcuVer进行更新
+        # After downloading the firmware using the URL and completing the MCU update, it is necessary to obtain the latest version information of the MCU and update it using setMcuVer
         Qth.setMcuVer("MCU1", "V1.0.0", self.sotaInfoCallback, self.sotaResultCallback)
 
     def sotaResultCallback(comp_no, result):
