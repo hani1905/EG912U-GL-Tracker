@@ -17,7 +17,7 @@ logger = getLogger(__name__)
 gpio = Pin(Pin.GPIO22, Pin.OUT, Pin.PULL_DISABLE, 1)    # Pull up P37
 
 
-def create_app(name="SimpliKit", version="1.0.0", config_path="/usr/config.json"):
+def create_app(name="Smart Tracker EG912U-EU", version="1.0.0", config_path="/usr/config.json"):
     _app = Application(name, version)
     _app.config.init(config_path)
 

@@ -46,7 +46,6 @@ class LbsService(object):
     def start_update(self):
         while True:
             if self.event.is_set():
-                print('\nLBS: USO')
                 lbs_data = self.read()
                 if lbs_data is None:
                     utime.sleep(2)
@@ -61,8 +60,8 @@ class LbsService(object):
                     utime.sleep(2)
                     continue
                 
-                logger.debug("send lbs data to qth server success, next report will be after 1800 seconds")
-                utime.sleep(15)
+                logger.debug("send lbs data to qth server success, next report will be after 300 seconds")
+                utime.sleep(300)
             else:
                 utime.sleep(0.1)
             
