@@ -3,8 +3,10 @@ import net
 import sim
 import modem
 from misc import Power
+from .threading import Event
 from .common import Storage
 from .collections import OrderedDict, Singleton
+
 
 
 @Singleton
@@ -39,6 +41,7 @@ class Application(object):
         self.config = Storage()
         self.__version = version
         self.__extensions = OrderedDict()
+        self.event = Event()
 
     def __repr__(self):
         return '{}(name=\"{}\", version=\"{}\")'.format(type(self).__name__, self.name, self.version)
@@ -91,6 +94,5 @@ class Application(object):
     @property
     def name(self):
         return self.__name
-
 
 CurrentApp = Application

@@ -64,7 +64,6 @@ class SensorService(object):
 
         while True:
             data = {}
-
             try:
                 temp1, humi = self.shtc3.getTempAndHumi()
                 logger.debug("temp1: {:0.2f}, humi: {:0.2f}".format(temp1, humi))
@@ -96,48 +95,5 @@ class SensorService(object):
 
             except Exception as e:
                 logger.error("getTempAndPressure error:{}".format(e))
-
-            utime.sleep_ms(100)
-
-            try:
-                rgb888 = self.tcs34725.getRGBValue()
-                logger.debug("R: {}, G: {}, B: {}".format((rgb888 >> 16) & 0xFF, (rgb888 >> 8) & 0xFF, rgb888 & 0xFF))
-
-                r = (rgb888 >> 16) & 0xFF
-                g = (rgb888 >> 8) & 0xFF
-                b = rgb888 & 0xFF
-
-                if prev_rgb888 is None:
-                    data.update({7: {1: r, 2: g, 3: b}})
-                    prev_rgb888 = rgb888
-                else:
-                    prev_r = (prev_rgb888 >> 16) & 0xFF
-                    dr = abs(r - prev_r)
-                    
-                    prev_g = (prev_rgb888 >> 8) & 0xFF
-                    dg = abs(g - prev_g)
-                    
-                    prev_b = prev_rgb888 & 0xFF
-                    db = abs(b - prev_b)
-
-                    # 色差超过 150 即认为颜色有变化
-                    if pow(sum((dr*dr, dg*dg, db*db)), 0.5) >= 150:
-                        data.update({7: {1: r, 2: g, 3: b}})
-                        prev_rgb888 = rgb888
-
-            except Exception as e:
-                logger.error("getRGBValue error:{}".format(e))
-
-            if data:
-                with CurrentApp().qth_client:
-                    for _ in range(3):
-                        if CurrentApp().qth_client.sendTsl(1, data):
-                            break
-                    else:
-                        prev_temp1 = None
-                        prev_humi = None
-                        prev_press = None
-                        prev_temp2 = None
-                        prev_rgb888 = None
 
             utime.sleep(1)
